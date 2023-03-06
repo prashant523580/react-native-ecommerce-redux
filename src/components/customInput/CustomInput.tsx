@@ -12,11 +12,12 @@ interface PropsTypes{
     icon: any,
     keyBoardType: KeyboardTypeOptions,
     secureTextEntry?: boolean,
-    children?:any
+    children?:any,
+    errorStyle? : any
 }
-export default function CustomInput({children,placeholder,onChangeText,icon,value,keyBoardType,secureTextEntry} : PropsTypes) {
+export default function CustomInput({children,placeholder,onChangeText,icon,value,keyBoardType,secureTextEntry,errorStyle} : PropsTypes) {
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, errorStyle]}>
         <Image source={icon} style={styles.icon}/>
       <TextInput style={styles.inputControl} secureTextEntry={secureTextEntry} keyboardType={keyBoardType} placeholder={placeholder}  value={value} onChangeText={onChangeText} />
       {children}
@@ -30,19 +31,22 @@ const styles = StyleSheet.create({
         flexDirection:"row",
         alignItems:"center",
         borderWidth: 2,
-        borderColor: "black",
+        justifyContent:"flex-start",
+        // borderColor: "black",
         position:"relative",
-        // width:"100%",
+        width:"100%",
         marginVertical:5,
         paddingHorizontal:5,
         borderRadius: 5,
+        overflow: "hidden",
     },
     icon:{
-        width: 20,
-        height: 20,
+        width: 25,
+        height: 25,
         marginHorizontal: 5
 
     },
     inputControl:{
+      width:"100%"
     }
 })
