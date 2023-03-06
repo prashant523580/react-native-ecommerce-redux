@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Image, ScrollView } from 'react-native'
+import { StyleSheet, Text, View, Image, ScrollView, Modal, Pressable, Alert } from 'react-native'
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { RootState } from '../redux-store/store'
@@ -7,10 +7,9 @@ import Card from '../components/card/Card'
 import { addToCart, removeCart } from '../redux-store/actions/cart.action'
 import CustomButton from '../components/common/CustomButton'
 import { TouchableOpacity } from 'react-native-gesture-handler'
-import { isAuthenticate } from '../redux-store/actions/user.action'
+import { addAddress, isAuthenticate } from '../redux-store/actions/user.action'
 import { UserAddressTypes } from '../types/user'
-import { Modal } from 'react-native/Libraries/Modal/Modal'
-import CommonModal from '../components/Modal/CommonModal'
+import CustomInput from '../components/customInput/CustomInput'
 const CheckoutHeader = (props: any) => {
     return (
         <View style={{
@@ -56,14 +55,134 @@ export default function Checkout() {
     const [addressChecked, setAddressChecked] = React.useState(false);
     const [selectedAddress, setSelectedAddress] = React.useState<UserAddressTypes>({});
     const [isOpen, setIsOpen] = React.useState(false);
+
+    const [modalVisible, setModalVisible] = React.useState(false);
+    const [userAddress, setUserAddress] = React.useState<UserAddressTypes>({
+        name: "",
+        city: "",
+        street: "",
+        phone: "",
+        email: ""
+    });
+    const handleAddressForm = () => {
+        if (userAddress.city && userAddress.email && userAddress.street && userAddress.phone && userAddress.name) {
+            console.log(address)
+
+            dispatch(addAddress(userAddress))
+            setModalVisible(false)
+        } else {
+            Alert.alert("please fill all input fields")
+        }
+    }
+
     const [cartChecked, setCartChecked] = React.useState(false);
     const { carts: { carts, subTotal }, user: { authenticate, user, address } } = useSelector((state: RootState) => state);
     const dispatch = useDispatch<any>();
-    console.log(carts, user, authenticate)
 
     return (
         <ScrollView style={styles.mainContainer}>
-            <CommonModal modalVisible={isOpen} />
+            {/* add address */}
+            <View style={styles.centeredView}>
+                <Modal
+                    animationType="slide"
+                    transparent={true}
+                    visible={modalVisible}
+                    onRequestClose={() => {
+                        // Alert.alert('Modal has been closed.');
+                        setModalVisible(!modalVisible);
+                    }}>
+                    <View style={styles.centeredView}>
+                        <View style={styles.modalView}>
+                            <Text style={{
+                                fontSize: 20,
+                                fontWeight:"bold",
+                                marginVertical: 5
+                            }}>Add New Address</Text>
+                            <View style={styles.formContainer}>
+                                <CustomInput
+                                    icon={require("../images/user.png")}
+                                    placeholder={"Full Name"}
+                                    keyBoardType={'ascii-capable'}
+                                    value={userAddress.name}
+                                    onChangeText={(text: string) => {
+                                        setUserAddress((pre: any) => {
+                                            return {
+                                                ...pre,
+                                                name: text
+                                            }
+                                        })
+                                    }}
+                                />
+                                <CustomInput
+                                    icon={require("../images/icon/city.png")}
+                                    placeholder={"City"}
+                                    keyBoardType={'ascii-capable'}
+                                    value={userAddress.city}
+                                    onChangeText={(text: string) => {
+                                        setUserAddress((pre: any) => {
+                                            return {
+                                                ...pre,
+                                                city: text
+                                            }
+                                        })
+                                    }}
+                                />
+                                <CustomInput
+                                    icon={require("../images/icon/pin.png")}
+                                    placeholder={"Street"}
+                                    keyBoardType={'ascii-capable'}
+                                    value={userAddress.street}
+                                    onChangeText={(text: string) => {
+                                        setUserAddress((pre: any) => {
+                                            return {
+                                                ...pre,
+                                                street: text
+                                            }
+                                        })
+                                    }}
+                                />
+                                <CustomInput
+                                    icon={require("../images/email.png")}
+                                    placeholder={"Email"}
+                                    keyBoardType={'email-address'}
+                                    value={userAddress.email}
+                                    onChangeText={(text: string) => {
+                                        setUserAddress((pre: any) => {
+                                            return {
+                                                ...pre,
+                                                email: text
+                                            }
+                                        })
+                                    }}
+                                />
+                                <CustomInput
+                                    icon={require("../images/mobile.png")}
+                                    placeholder={"Phone"}
+                                    keyBoardType={'phone-pad'}
+                                    value={userAddress.phone}
+                                    onChangeText={(text: string) => {
+                                        setUserAddress((pre: any) => {
+                                            return {
+                                                ...pre,
+                                                phone: text
+                                            }
+                                        })
+                                    }}
+                                />
+                                <Pressable style={[styles.button,{
+                                    width:150,
+                                    alignSelf:"center"
+                                }]} onPress={handleAddressForm}>
+                                    <Text style={{ color: "white", textTransform: "capitalize",textAlign:"center" }}>Save address</Text>
+                                </Pressable>
+                                
+                            </View>
+
+                        </View>
+                    </View>
+                </Modal>
+            </View>
+            {/* add address end */}
             <View style={styles.container}>
                 <CheckoutHeader active={authenticate === true} step={1} title="Login" image={require("../images/user.png")} />
                 <View style={styles.checkoutBody}>
@@ -84,6 +203,7 @@ export default function Checkout() {
                     }
                 </View>
             </View>
+            {/* address start */}
             <View style={styles.container}>
                 <CheckoutHeader active={authenticate === true} step={2} title="Delivery Address" image={require("../images/icon/pin.png")} />
 
@@ -104,7 +224,7 @@ export default function Checkout() {
                             <AddressComponent title={selectedAddress.phone} icon={require("../images/mobile.png")} />
 
                         </View> :
-                            address.length > 0 &&
+                            address &&
                             address.map((addrs: UserAddressTypes, ind: number) => {
                                 return (
                                     <View key={ind} style={{
@@ -149,14 +269,18 @@ export default function Checkout() {
                     <View
                         style={styles.stepButton}
                     >
-
-                        <CustomButton fgColor='white' bgColor='black' title='next' onPress={() => {
-                            setIsOpen(true)
+                            {!addressChecked &&
+                        <CustomButton fgColor='white' bgColor='black' title='Add Address' onPress={() => {
+                            setModalVisible(true)
                         }} />
+                    }
+
                     </View>
 
                 </View>
             </View>
+            {/* address end */}
+            {/* cart review start */}
             <View style={styles.container}>
                 <CheckoutHeader active={addressChecked === true} step={3} title="cart reviews" image={require("../images/icon/shopping-cart.png")} />
                 {
@@ -212,6 +336,8 @@ export default function Checkout() {
                     </View>
                 }
             </View>
+            {/* cart review end */}
+            {/* payment start */}
             <View style={styles.container}>
                 <CheckoutHeader image={require("../images/credit-card.png")} step={4} title={"Payment Methods"} />
                 {
@@ -238,6 +364,7 @@ export default function Checkout() {
                     </View>
                 }
             </View>
+            {/* payment end */}
         </ScrollView>
     )
 }
@@ -292,5 +419,50 @@ const styles = StyleSheet.create({
         width: 20,
         height: 20,
         tintColor: "gray"
-    }
+    },
+    centeredView: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: 22,
+    },
+    modalView: {
+        margin: 20,
+        backgroundColor: 'white',
+        borderRadius: 20,
+        padding: 35,
+        alignItems: 'center',
+        shadowColor: '#000',
+        // width: 200,
+        // height: 200,
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 5,
+        // flex: 1,
+        justifyContent: "center",
+    },
+    //   button: {
+    //     borderRadius: 20,
+    //     padding: 10,
+    //     elevation: 2,
+    //   },
+    buttonOpen: {
+        backgroundColor: '#F194FF',
+    },
+    buttonClose: {
+        backgroundColor: '#2196F3',
+    },
+    textStyle: {
+        color: 'white',
+        fontWeight: 'bold',
+        textAlign: 'center',
+    },
+    modalText: {
+        marginBottom: 15,
+        textAlign: 'center',
+    },
 })
