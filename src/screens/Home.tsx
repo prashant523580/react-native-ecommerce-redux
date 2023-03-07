@@ -51,7 +51,7 @@ React.useEffect(() => {
         }]}>
 
           <TouchableOpacity style={[styles.button, {
-            backgroundColor: selectedTab === 2 ? "green" : "lightgreen",
+            backgroundColor: selectedTab === 2 ? "lightgreen" : "#3af900",
             width: 50,
             height: 50,
             borderRadius: 50,

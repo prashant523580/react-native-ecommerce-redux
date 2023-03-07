@@ -10,6 +10,7 @@ import { TouchableOpacity } from 'react-native-gesture-handler'
 import { addAddress, isAuthenticate } from '../redux-store/actions/user.action'
 import { UserAddressTypes } from '../types/user'
 import CustomInput from '../components/customInput/CustomInput'
+import EsewaComponent from '../components/payment/Esewa'
 const CheckoutHeader = (props: any) => {
     return (
         <View style={{
@@ -51,6 +52,39 @@ const AddressComponent = ({ title, icon }: any) => {
         </View>
     )
 }
+const Addresses = ({ onPress, addrs }: any) => {
+    return (
+        <View style={{
+            flexDirection: "row",
+            elevation: 2,
+            backgroundColor: "white",
+            marginVertical: 10,
+            paddingVertical: 10,
+            paddingHorizontal: 10,
+            justifyContent: "center",
+            alignItems: "center",
+            borderRadius: 10
+
+        }}>
+            <View style={{
+                width: "70%"
+            }}>
+
+                <AddressComponent title={addrs.name} icon={require("../images/navigation-icon/account.png")} />
+                <AddressComponent title={addrs.email} icon={require("../images/email.png")} />
+                <AddressComponent title={addrs.city} icon={require("../images/icon/city.png")} />
+                <AddressComponent title={addrs.street} icon={require("../images/icon/pin.png")} />
+                <AddressComponent title={addrs.phone} icon={require("../images/mobile.png")} />
+
+            </View>
+            <CustomButton style={{
+                borderRadius:1,
+                paddingVertical:5
+            }} onPress={onPress} fgColor="black"  borderWidth={1} borderColor={"black"} title='Select' />
+
+        </View>
+    )
+}
 export default function Checkout() {
     const [addressChecked, setAddressChecked] = React.useState(false);
     const [selectedAddress, setSelectedAddress] = React.useState<UserAddressTypes>({});
@@ -70,6 +104,7 @@ export default function Checkout() {
 
             dispatch(addAddress(userAddress))
             setModalVisible(false)
+            setUserAddress({})
         } else {
             Alert.alert("please fill all input fields")
         }
@@ -95,10 +130,10 @@ export default function Checkout() {
                         <View style={styles.modalView}>
                             <Text style={{
                                 fontSize: 20,
-                                fontWeight:"bold",
+                                fontWeight: "bold",
                                 marginVertical: 5
                             }}>Add New Address</Text>
-                            <View style={styles.formContainer}>
+                            <View >
                                 <CustomInput
                                     icon={require("../images/user.png")}
                                     placeholder={"Full Name"}
@@ -169,13 +204,13 @@ export default function Checkout() {
                                         })
                                     }}
                                 />
-                                <Pressable style={[styles.button,{
-                                    width:150,
-                                    alignSelf:"center"
+                                <Pressable style={[styles.button, {
+                                    width: 150,
+                                    alignSelf: "center"
                                 }]} onPress={handleAddressForm}>
-                                    <Text style={{ color: "white", textTransform: "capitalize",textAlign:"center" }}>Save address</Text>
+                                    <Text style={{ color: "white", textTransform: "capitalize", textAlign: "center" }}>Save address</Text>
                                 </Pressable>
-                                
+
                             </View>
 
                         </View>
@@ -208,74 +243,73 @@ export default function Checkout() {
                 <CheckoutHeader active={authenticate === true} step={2} title="Delivery Address" image={require("../images/icon/pin.png")} />
 
                 <View style={styles.checkoutBody}>
-
                     {
-                        selectedAddress.email ? <View style={{
-                            elevation: 2,
-                            backgroundColor: "white",
-                            marginVertical: 10,
-                            paddingVertical: 10,
-                            paddingHorizontal: 5
-                        }}>
-                            <AddressComponent title={selectedAddress.name} icon={require("../images/user.png")} />
-                            <AddressComponent title={selectedAddress.email} icon={require("../images/email.png")} />
-                            <AddressComponent title={selectedAddress.city} icon={require("../images/icon/city.png")} />
-                            <AddressComponent title={selectedAddress.street} icon={require("../images/icon/pin.png")} />
-                            <AddressComponent title={selectedAddress.phone} icon={require("../images/mobile.png")} />
 
-                        </View> :
-                            address &&
-                            address.map((addrs: UserAddressTypes, ind: number) => {
-                                return (
-                                    <View key={ind} style={{
-                                        flexDirection: "row",
-                                        elevation: 2,
-                                        backgroundColor: "white",
-                                        marginVertical: 10,
-                                        paddingVertical: 10,
-                                        justifyContent: "space-around",
-                                        alignItems: "center",
+                        address && !addressChecked &&
+                        address.map((addrs: UserAddressTypes, ind: number) => {
+                            return (
+                                <Addresses key={ind} addrs={addrs}
+                                    onPress={() => {
+                                        // setAddressChecked(true);
+                                        setSelectedAddress(addrs)
+                                    }} />
+                            )
+                        })
 
-                                    }}>
-                                        <View>
 
-                                            <AddressComponent title={addrs.name} icon={require("../images/user.png")} />
-                                            <AddressComponent title={addrs.email} icon={require("../images/email.png")} />
-                                            <AddressComponent title={addrs.city} icon={require("../images/icon/city.png")} />
-                                            <AddressComponent title={addrs.street} icon={require("../images/icon/pin.png")} />
-                                            <AddressComponent title={addrs.phone} icon={require("../images/mobile.png")} />
-
-                                        </View>
-                                        <TouchableOpacity
-                                            onPress={() => {
-                                                setAddressChecked(true);
-                                                setSelectedAddress(addrs)
-
-                                            }}
-                                        >
-                                            {/* <Image style={{
-                                            width: 24,
-                                            height: 24,
-                                            tintColor: "white"
-                                        }} 
-                                            source={}
-                                        /> */}
-                                            <Text>select</Text>
-                                        </TouchableOpacity>
-                                    </View>
-                                )
-                            })
                     }
-                    <View
-                        style={styles.stepButton}
-                    >
-                            {!addressChecked &&
-                        <CustomButton fgColor='white' bgColor='black' title='Add Address' onPress={() => {
-                            setModalVisible(true)
-                        }} />
+                    
+                        {!addressChecked &&
+                            <CustomButton fgColor='white' style={{
+                                width: 150,
+                                alignSelf:"center",
+                                borderTopColor:"white",
+                                borderBottomColor:"black",
+                                borderLeftColor:"black",
+                                borderRightColor:"white",
+                                elevation: 0
+                            }}
+                            bgColor={"rgba(0,0,0,0.3)"}
+                            borderWidth={1}  title='Add Address' onPress={() => {
+                                setModalVisible(true)
+                            }} />
+                        }
+                    {
+                        selectedAddress.email ?
+                            <View>
+                                <Text style={{
+                                    textAlign: "center",
+                                    borderBottomColor: 'orange',
+                                    borderBottomWidth: 2,
+                                    fontSize: 18,
+                                    
+                                }}>Selected Address</Text>
+
+                                <View style={{
+                                    elevation: 2,
+                                    backgroundColor: "white",
+                                    marginVertical: 10,
+                                    paddingVertical: 10,
+                                    paddingHorizontal: 5,
+                                    borderRadius: 10,
+                                }}>
+                                    <AddressComponent title={selectedAddress.name} icon={require("../images/navigation-icon/account.png")} />
+                                    <AddressComponent title={selectedAddress.email} icon={require("../images/email.png")} />
+                                    <AddressComponent title={selectedAddress.city} icon={require("../images/icon/city.png")} />
+                                    <AddressComponent title={selectedAddress.street} icon={require("../images/icon/pin.png")} />
+                                    <AddressComponent title={selectedAddress.phone} icon={require("../images/mobile.png")} />
+
+                                </View>
+
+                                {
+                                    !addressChecked &&
+                                    <CustomButton title='Confirm Address' fgColor='white' bgColor='orange' onPress={() => setAddressChecked(true)} />
+                                }
+                            </View>
+                            : null
                     }
 
-                    </View>
+
 
                 </View>
             </View>
@@ -347,10 +381,7 @@ export default function Checkout() {
 
                             <Text style={styles.buttonText}> Cash On Delivery</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity style={styles.button}>
-
-                            <Text style={styles.buttonText}> ESewa</Text>
-                        </TouchableOpacity>
+                        <EsewaComponent />
                         <View>
                             <TouchableOpacity style={[styles.button, {
                                 width: 100,
@@ -384,8 +415,9 @@ const styles = StyleSheet.create({
         borderRadius: 4
     },
     checkoutBody: {
-        paddingHorizontal: 15,
-        paddingVertical: 5
+        paddingHorizontal: 10,
+        paddingVertical: 5,
+
     },
     stepButton: {
         width: 100,
@@ -409,6 +441,7 @@ const styles = StyleSheet.create({
         marginVertical: 1,
         flexDirection: "row",
         alignItems: "center",
+        width: "80%",
         // justifyContent:"center",
     },
     addressText: {

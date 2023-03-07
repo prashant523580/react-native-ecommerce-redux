@@ -32,7 +32,10 @@ const userReducer = (state :StateProps = initState , actions: PayloadAction<any>
             const deletedArrray = state.address.filter((item,index) =>{
                 return  index !== actions.payload
             })
-            return deletedArrray;
+            state ={
+                ...state,
+                address: deletedArrray
+            }
 
 
     }
