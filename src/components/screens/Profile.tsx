@@ -37,7 +37,9 @@ export default function ProfileComponent({navigate}: any) {
       }}>
         <Text>Address</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.button} onPress={logout}>
+      <TouchableOpacity style={styles.button} onPress={() => {
+        navigation.navigate("Orders")
+      }}>
         <Text>Orders</Text>
       </TouchableOpacity>
       <TouchableOpacity style={styles.button} onPress={logout}>

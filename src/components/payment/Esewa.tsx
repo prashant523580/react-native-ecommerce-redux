@@ -19,7 +19,7 @@ const EsewaComponent = () => {
         onPress={() => setisVisible(true)}
         style={{ width: 100, height: 50, backgroundColor: 'red' }}
       >
-        <Text>'Esewa test</Text>
+        <Text>Esewa test</Text>
       </Pressable>
       {response?.token && <Text>{`ref id: ${response.token}`}</Text>}
 

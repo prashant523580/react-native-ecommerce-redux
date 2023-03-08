@@ -14,6 +14,7 @@ import ProductDetails from './screens/ProductDetails';
 import Address from './screens/Address';
 import AddAddress from './screens/AddAddress';
 import Checkout from './screens/Checkout';
+import Orders from './screens/Orders';
 
 export type ScreenNames = {
   navigate(arg0: string): unknown;
@@ -24,7 +25,8 @@ export type ScreenNames = {
   "ProductDetails":{product:any },
   "Address": undefined,
   "AddAddress": undefined,
-  "Checkout": undefined
+  "Checkout": undefined,
+  "Orders" : undefined,
 }
 // export type ScreenNames = ["Splash","Home","Login","Register","ProductDetails"]
  // type these manually
@@ -59,8 +61,11 @@ export default function AppNavigation() {
             headerShown:false,
         }} name='AddAddress' component={AddAddress}/>
         <Stack.Screen options={{
-            headerShown:false,
+            // headerShown:false,
         }} name='Checkout' component={Checkout}/>
+        <Stack.Screen options={{
+            // headerShown:false,
+        }} name='Orders' component={Orders}/>
     </Stack.Navigator>
   </NavigationContainer>
   )

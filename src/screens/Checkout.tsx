@@ -11,6 +11,7 @@ import { addAddress, isAuthenticate } from '../redux-store/actions/user.action'
 import { UserAddressTypes } from '../types/user'
 import CustomInput from '../components/customInput/CustomInput'
 import EsewaComponent from '../components/payment/Esewa'
+import { addOrder } from '../redux-store/actions/order.action'
 const CheckoutHeader = (props: any) => {
     return (
         <View style={{
@@ -44,7 +45,7 @@ const CheckoutHeader = (props: any) => {
         </View>
     )
 }
-const AddressComponent = ({ title, icon }: any) => {
+export const AddressComponent = ({ title, icon }: any) => {
     return (
         <View style={styles.address}>
             <Image source={icon} style={styles.icon} />
@@ -52,7 +53,7 @@ const AddressComponent = ({ title, icon }: any) => {
         </View>
     )
 }
-const Addresses = ({ onPress, addrs }: any) => {
+export const Addresses = ({ onPress, addrs }: any) => {
     return (
         <View style={{
             flexDirection: "row",
@@ -78,9 +79,9 @@ const Addresses = ({ onPress, addrs }: any) => {
 
             </View>
             <CustomButton style={{
-                borderRadius:1,
-                paddingVertical:5
-            }} onPress={onPress} fgColor="black"  borderWidth={1} borderColor={"black"} title='Select' />
+                borderRadius: 1,
+                paddingVertical: 5
+            }} onPress={onPress} fgColor="black" borderWidth={1} borderColor={"black"} title='Select' />
 
         </View>
     )
@@ -98,6 +99,10 @@ export default function Checkout() {
         phone: "",
         email: ""
     });
+
+    const [cartChecked, setCartChecked] = React.useState(false);
+    const { carts: { carts, subTotal }, user: { authenticate, user, address },orders } = useSelector((state: RootState) => state);
+    const dispatch = useDispatch<any>();
     const handleAddressForm = () => {
         if (userAddress.city && userAddress.email && userAddress.street && userAddress.phone && userAddress.name) {
             console.log(address)
@@ -109,11 +114,19 @@ export default function Checkout() {
             Alert.alert("please fill all input fields")
         }
     }
+    React.useEffect(() => {
+        console.log(orders)
+    },[orders])
 
-    const [cartChecked, setCartChecked] = React.useState(false);
-    const { carts: { carts, subTotal }, user: { authenticate, user, address } } = useSelector((state: RootState) => state);
-    const dispatch = useDispatch<any>();
-
+    const handleAddOrder =() => {
+        let order = {
+            userId:2,
+            address:selectedAddress,
+            orders: carts,
+            totalAmount: subTotal
+        }
+        dispatch(addOrder(order))
+    }
     return (
         <ScrollView style={styles.mainContainer}>
             {/* add address */}
@@ -258,22 +271,22 @@ export default function Checkout() {
 
 
                     }
-                    
-                        {!addressChecked &&
-                            <CustomButton fgColor='white' style={{
-                                width: 150,
-                                alignSelf:"center",
-                                borderTopColor:"white",
-                                borderBottomColor:"black",
-                                borderLeftColor:"black",
-                                borderRightColor:"white",
-                                elevation: 0
-                            }}
+
+                    {!addressChecked &&
+                        <CustomButton fgColor='white' style={{
+                            width: 150,
+                            alignSelf: "center",
+                            borderTopColor: "white",
+                            borderBottomColor: "black",
+                            borderLeftColor: "black",
+                            borderRightColor: "white",
+                            elevation: 0
+                        }}
                             bgColor={"rgba(0,0,0,0.3)"}
-                            borderWidth={1}  title='Add Address' onPress={() => {
+                            borderWidth={1} title='Add Address' onPress={() => {
                                 setModalVisible(true)
                             }} />
-                        }
+                    }
                     {
                         selectedAddress.email ?
                             <View>
@@ -282,7 +295,7 @@ export default function Checkout() {
                                     borderBottomColor: 'orange',
                                     borderBottomWidth: 2,
                                     fontSize: 18,
-                                    
+
                                 }}>Selected Address</Text>
 
                                 <View style={{
@@ -306,7 +319,7 @@ export default function Checkout() {
                                     <CustomButton title='Confirm Address' fgColor='white' bgColor='orange' onPress={() => setAddressChecked(true)} />
                                 }
                             </View>
-                            : null
+                            : <Text>Please select address</Text>
                     }
 
 
@@ -386,7 +399,9 @@ export default function Checkout() {
                             <TouchableOpacity style={[styles.button, {
                                 width: 100,
                                 backgroundColor: "green"
-                            }]}>
+                            }]}
+                            onPress={handleAddOrder}
+                            >
 
                                 <Text style={[styles.buttonText]}> Order {subTotal}</Text>
                             </TouchableOpacity>

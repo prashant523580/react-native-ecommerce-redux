@@ -20,6 +20,6 @@ export const authConstants ={
     AUTH_LOGIN : "AUTH_LOGIN",
     
 }
-// export const addressConstants ={
-//     ADD_AUTH : "ADD_AUTH"
-// }
+export const orderConstants ={
+    ADD_ORDER : "ADD_ORDER"
+}
